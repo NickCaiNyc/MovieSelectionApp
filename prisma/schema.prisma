@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Theater {
+  id     String  @id @default(cuid())
+  name   String
+  city   String
+  lat    Float
+  lon    Float
+  shows  Showtime[]
+}
+
+model Showtime {
+  id        String   @id @default(cuid())
+  movieId   String
+  theaterId String
+  startAt   DateTime
+  theater   Theater  @relation(fields: [theaterId], references: [id])
+  seatMap   SeatMap?
+}
+
+model SeatMap {
+  id          String   @id @default(cuid())
+  showtimeId  String   @unique
+  rows        Int
+  cols        Int
+  taken       Json
+  restricted  Json?
+  showtime    Showtime @relation(fields: [showtimeId], references: [id])
+}
+
+model UserPref {
+  userId    String @id
+  zone      String
+  timeStart Int
+  timeEnd   Int
+  radiusKm  Int
+  partySize Int
+}
